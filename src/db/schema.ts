@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -59,3 +67,33 @@ export const verification = pgTable("verification", {
     () => /* @__PURE__ */ new Date()
   ),
 });
+
+export const category = pgTable("category", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").unique().notNull(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
+});
+export const foodItem = pgTable("foodItem", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  categoryId: uuid("categoryId").references(() => category.id, {
+    onDelete: "cascade",
+  }),
+  name: text("name").notNull().unique(),
+  rating: integer().default(sql`'1'::int`),
+  price: integer().default(sql`'5'::int`),
+  imageUrl: text(),
+  createdAt: timestamp("created_at").$defaultFn(() => new Date()),
+  updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
+});
+
+export const categoryRelations = relations(category, ({ many }) => ({
+  foodItems: many(foodItem),
+}));
+
+export const foodItemRelations = relations(foodItem, ({ one }) => ({
+  category: one(category, {
+    fields: [foodItem.categoryId],
+    references: [category.id],
+  }),
+}));

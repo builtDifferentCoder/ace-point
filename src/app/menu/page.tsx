@@ -1,7 +1,7 @@
-import React from "react";
+import { CategoryView } from "@/modules/menu/ui/views/category-view";
 
 const Page = () => {
-  return <div>Menu</div>;
+  return <CategoryView />;
 };
 
 export default Page;

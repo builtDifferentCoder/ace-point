@@ -24,7 +24,8 @@ function getQueryClient() {
 }
 function getUrl() {
   const base = (() => {
-    return `${process.env.NEXT_APP_URL}`;
+    if (typeof window !== undefined) return "";
+    return process.env.NEXT_APP_URL;
   })();
   return `${base}/api/trpc`;
 }
