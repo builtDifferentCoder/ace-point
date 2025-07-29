@@ -1,3 +1,4 @@
+import { db } from "@/db";
 import { initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
@@ -20,4 +21,10 @@ const t = initTRPC.create({
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
-export const baseProcedure = t.procedure;
+export const baseProcedure = t.procedure.use(async ({ next }) => {
+  return next({
+    ctx: {
+      db,
+    },
+  });
+});

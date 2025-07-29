@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { TRPCReactProvider } from "@/trpc/client";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,11 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className}`}>
-        <div className="bg-black text-white mx-auto flex flex-col  max-w-7xl w-full min-h-screen  px-4 sm:px-6 md:px-8 lg:px-12">
-          <Toaster />
-          <Navbar />
-          <main>{children}</main>
-        </div>
+        <TRPCReactProvider>
+          <div className="bg-black text-white mx-auto flex flex-col  max-w-7xl w-full min-h-screen  px-4 sm:px-6 md:px-8 lg:px-12">
+            <Toaster />
+            <Navbar />
+            <main>{children}</main>
+          </div>
+        </TRPCReactProvider>
       </body>
     </html>
   );
