@@ -16,17 +16,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { UploadButton } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
+
 export const AddFoodItem = ({ isOpen, onOpenChange }: Props) => {
   const [name, setName] = useState("");
-  const [rating, setRating] = useState<string | undefined>(undefined);
-  const [price, setPrice] = useState<string | undefined>(undefined);
-  const [imageUrl, setImageUrl] = useState("");
+  const [rating, setRating] = useState<string>("");
+  const [price, setPrice] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.category.getMany.queryOptions());
+  const { mutateAsync } = useMutation(trpc.foodItem.create.mutationOptions());
+  console.log(name, rating, price, imageUrl, category);
+  const handleClick = async () => {
+    await mutateAsync(
+      {
+        name,
+        categoryId: category ? category : "",
+        rating: Number(rating ? rating : 0),
+        price: Number(price ? price : 0),
+        imageUrl: imageUrl,
+      },
+      {
+        onSuccess: () => toast.success("Food Item added successfully."),
+        onError: (e) => toast.error(e.message),
+      }
+    );
+    setName("");
+    setRating("");
+    setPrice("");
+    setCategory("");
+    setImageUrl("");
+  };
   return (
     <div>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -40,15 +70,18 @@ export const AddFoodItem = ({ isOpen, onOpenChange }: Props) => {
             <DialogHeader>
               <DialogTitle className="text-center">Add Product</DialogTitle>
               {/* to do make the select dynamic */}
-              <Select>
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="w-full mt-2">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Categories</SelectLabel>
-                    <SelectItem value="item">Rice</SelectItem>
-                    <SelectItem value="item">Curry</SelectItem>
+                    {data?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -73,14 +106,22 @@ export const AddFoodItem = ({ isOpen, onOpenChange }: Props) => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
-              <Input
-                className="mt-2 w-full"
-                type="file"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-              />
             </DialogHeader>
-            <Button className="w-full hover:bg-black/70">Add Product</Button>
+            <div className="flex items-center justify-center bg-black/90 text-white rounded-2xl shadow-md p-2 hover:bg-black/70">
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  const image = res?.[0].ufsUrl;
+                  if (!image)
+                    throw new Error("No image found.Please try again");
+                  setImageUrl(image);
+                  toast("Image uploaded successfully");
+                }}
+              />
+            </div>
+            <Button className="w-full hover:bg-black/70" onClick={handleClick}>
+              Add Product
+            </Button>
           </DialogContent>
         </div>
       </Dialog>

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { AddCategory } from "../components/add-category";
 import { AddFoodItem } from "../components/add-food-item";
+import { CategoryList } from "../components/category-list";
 
 export const CategoryView = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,7 @@ export const CategoryView = () => {
         <AddCategory isOpen={isOpen} onOpenChange={setIsOpen} />
         <AddFoodItem isOpen={isItemOpen} onOpenChange={setIsItemOpen} />
       </div>
+      <CategoryList />
     </div>
   );
 };
