@@ -11,10 +11,17 @@ export const categoryRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const data = await ctx.db.insert(category).values({
-        name: input.name,
-      });
-      return data;
+      const [data] = await ctx.db
+        .insert(category)
+        .values({
+          name: input.name,
+        })
+        .returning();
+      if (!data)
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Failed to create category",
+        });
     }),
   getMany: baseProcedure.query(async ({ ctx }) => {
     const categories = await ctx.db.select().from(category);

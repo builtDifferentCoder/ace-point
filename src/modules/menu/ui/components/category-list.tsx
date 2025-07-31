@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
+import { ProductCard } from "./product-card";
 
 export const CategoryList = () => {
   const trpc = useTRPC();
@@ -19,6 +20,7 @@ export const CategoryList = () => {
           </div>
         ))}
       </div>
+      <ProductCard />
     </>
   );
 };

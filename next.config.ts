@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         // pathname: '/my-bucket/**',
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "t2fvlyekl4.ufs.sh",
+        port: "",
+        search: "",
+      },
     ],
   },
 };
