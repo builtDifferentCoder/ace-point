@@ -34,7 +34,7 @@ export const AddFoodItem = ({ isOpen, onOpenChange }: Props) => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const trpc = useTRPC();
-  const { data } = useQuery(trpc.category.getMany.queryOptions());
+  const { data } = useQuery(trpc.category.getMany.queryOptions({}));
   const { mutateAsync } = useMutation(trpc.foodItem.create.mutationOptions());
   console.log(name, rating, price, imageUrl, category);
   const handleClick = async () => {
@@ -77,7 +77,7 @@ export const AddFoodItem = ({ isOpen, onOpenChange }: Props) => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Categories</SelectLabel>
-                    {data?.map((category) => (
+                    {data?.categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
                       </SelectItem>
