@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { uploadRouter } from "./api/uploadthing/core";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,14 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className}`}>
-        <TRPCReactProvider>
-          <div className="bg-black text-white mx-auto flex flex-col  max-w-7xl w-full min-h-screen  px-4 sm:px-6 md:px-8 lg:px-12">
-            <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
-            <Toaster />
-            <Navbar />
-            <main>{children}</main>
-          </div>
-        </TRPCReactProvider>
+        <NuqsAdapter>
+          <TRPCReactProvider>
+            <div className="bg-black text-white mx-auto flex flex-col  max-w-7xl w-full min-h-screen  px-4 sm:px-6 md:px-8 lg:px-12">
+              <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
+              <Toaster />
+              <Navbar />
+              <main>{children}</main>
+            </div>
+          </TRPCReactProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

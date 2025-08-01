@@ -1,15 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { StarIcon, ShoppingBagIcon, Trash2Icon } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ShoppingBagIcon, StarIcon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
-export const ProductCard = () => {
+interface Props {
+  data:
+    | {
+        categoryName: string | null;
+        name: string | null;
+        id: string | null;
+        price: number | null;
+        rating: number | null;
+        imageUrl: string | null;
+      }[]
+    | undefined;
+}
+
+export const FilteredProducts = ({ data }: Props) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const { data: products } = useQuery(trpc.foodItem.getMany.queryOptions());
   const { mutateAsync } = useMutation(trpc.foodItem.remove.mutationOptions());
   const handleRemove = async (id: string) => {
     await mutateAsync(
@@ -25,16 +37,16 @@ export const ProductCard = () => {
   };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-8 space-y-4">
-      {(products ?? []).map((product) => (
+      {(data ?? []).map((item) => (
         <div
           className="relative flex flex-col w-[300px] p-4 bg-white h-[320px] rounded-xl shadow-md transition hover:shadow-lg"
-          key={product.id}
+          key={item.id}
         >
           <div className="relative h-40 flex items-center justify-center overflow-hidden rounded-xl">
-            {product.imageUrl ? (
+            {item.imageUrl ? (
               <Image
-                src={product.imageUrl}
-                alt={product.name}
+                src={item.imageUrl}
+                alt={item.name!}
                 width={300}
                 height={120}
                 className="object-contain  hover:scale-110 transition-all ease-in-out"
@@ -44,16 +56,14 @@ export const ProductCard = () => {
             )}
           </div>
           <div className="mt-3 ml-1 flex justify-between items-center">
-            <h2 className="text-black/70 font-lg leading-tight">
-              {product.name}
-            </h2>
-            <h1 className="text-black text-2xl ">{product.categoryName}</h1>
+            <h2 className="text-black/70 font-lg leading-tight">{item.name}</h2>
+            <h1 className="text-black text-2xl ">{item.categoryName}</h1>
           </div>
           <div className="flex justify-between px-4 py-2 items-center">
-            {product?.rating ? (
+            {item?.rating ? (
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, i) =>
-                  product.rating! > i ? (
+                  item.rating! > i ? (
                     <StarIcon key={uuidv4()} fill="blue" />
                   ) : (
                     <StarIcon key={uuidv4()} fill="black" />
@@ -66,7 +76,7 @@ export const ProductCard = () => {
                 currency: "USD",
                 style: "currency",
                 maximumFractionDigits: 2,
-              }).format(product.price!)}
+              }).format(item.price!)}
             </h3>
           </div>
           <div className="flex items-center justify-between mt-2">
@@ -76,7 +86,7 @@ export const ProductCard = () => {
             <Button
               variant="destructive"
               className="hover:bg-red-500/90"
-              onClick={() => handleRemove(product.id)}
+              onClick={() => handleRemove(item.id!)}
             >
               <Trash2Icon />
             </Button>
